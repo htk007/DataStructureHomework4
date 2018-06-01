@@ -1,0 +1,193 @@
+/*
+	Author: Hasan KAYA
+	Id: 150112041
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <Stack.h>
+#include<ctype.h>
+#define MAX_EXPR_SIZE 100
+
+int EvaluatePQ(char *expr, int p, int q) {
+
+    Stack *stackNumber,*stackOperator; //We define to stacks
+
+    stackNumber = (Stack *)malloc(sizeof(Stack));
+	Stack_initialize(stackNumber);
+
+    stackOperator = (Stack *)malloc(sizeof(Stack));
+	Stack_initialize(stackOperator);
+    char k;
+    int s =0;
+    int sonuc;
+    char v1,v2,op;
+while(expr[s] != '\0')
+        {
+        k = expr[s];
+
+        if(k == '(');
+        else if( k == '>')Stack_Push(stackOperator,k);
+        else if(k=='.' ) Stack_Push(stackOperator,k);
+        else if(k=='+')  Stack_Push(stackOperator,k);
+        else if(k=='x') Stack_Push(stackOperator,k);
+        else if(k=='\'')
+            {
+                Stack_Push(stackOperator,k);
+                if(k==')')
+                        {
+                         v1 =Stack_Pop(stackNumber);
+                        if(v1 =='1') sonuc = 0;
+                        else if(v1 == '0') sonuc = 1;
+                        else if(v1 == p)
+                            {
+                            if(p == 1) sonuc =0;
+                            else sonuc =1;
+                            }
+                          else if(v1 == q)
+                            {
+                            if(q == 1) sonuc =0;
+                            else sonuc =1;
+                            }
+                        }/// NOT operatörü için dýþ parantez kontrolü
+                         Stack_Push(stackNumber,sonuc);
+            }///NOT iþareti kontrolü
+else if (isdigit(k)){ Stack_Push(stackNumber,k); }
+else if(k =='p' || k=='q' ) { Stack_Push(stackNumber,k); }
+ else if(k ==')')
+    {
+        if(stackOperator->n >0)
+                    {
+                    v1 = Stack_Pop(stackNumber);
+                    v2 = Stack_Pop(stackNumber);
+                    op = Stack_Pop(stackOperator);
+
+                     if(op =='>')
+                        {
+                        if(v2 == '1' && v1 =='0') sonuc=0;
+                        else if(v2 ==p && v1 ==q)
+                            {
+                            if(p =='1' && q == '0') sonuc =0;
+                            else sonuc =1;
+                            }
+                        else if(v2==q && v1==p)
+                            {
+                            if(q=='1' && p =='0') sonuc =0;
+                            else sonuc =1;
+                            }
+                        else if(v2==p && v1 =='1') sonuc =1;
+                        else if(v2 ==p && v1 =='0')
+                            {
+                            if(p=='1') sonuc =0;
+                            else sonuc =1;
+                            }
+                        else if(v2==q && v1=='1') sonuc =1;
+                        else if(v2 ==q && v1 =='0')
+                            {
+                            if(q =='1') sonuc=0;
+                            else sonuc =1;
+                            }
+                        }/// > kontroller ending
+
+            else if(op =='.')
+                        {
+                            if(v1 =='0' || v2 =='0')sonuc =0;
+                            else if(v1=='1' && v2=='1') sonuc =1;
+                             else if(v1 == p && v2 ==q )
+                                {
+                                if(p =='0' || q =='0') sonuc =0;
+                                else sonuc =1;
+                                }
+                            else if(v1 == q || v2 == p)
+                                {
+                                if(p =='0' || q =='0') sonuc =0;
+                                else sonuc =1;
+                                }
+
+                        }/// . controller ending
+
+            else if(op == '+')
+                        {
+                         if(v1 =='1' || v2 =='1')sonuc =1;
+                            else if(v1=='0' && v2=='0') sonuc =0;
+                        else if(v1 == p && v2 ==q )
+                                {
+                                    printf("HELLO");
+                                if(p =='1' || q =='1') sonuc =1;
+                                else sonuc =0;
+                                }
+                            else if(v1 == q || v2 == p)
+                                {
+                                if(p =='1' || q =='1') sonuc =1;
+                                else sonuc =0;
+                                //Stack_Push(stackNumber,sonuc);
+                                }
+                        }/// + controller ending
+
+            else if(op =='x')
+                        {
+                            if(v1 == v2) sonuc = 0;
+                            else if( v1 != v2 ) sonuc =1;
+                            else if(v1 == p && v2 == 1 )
+                                {
+                                if(p ==1) sonuc = 0;
+                                else sonuc =1;
+                                }
+                                else if( v1==1 && v2==p)
+                                    {
+                                if(p ==1) sonuc = 0;
+                                else sonuc =1;
+                                    }
+                            else if(v1 ==p && v2 ==0 )
+                                {
+
+                                }
+                                else if(v1==0 && v2==p)
+                                    {
+                                if(p ==0) sonuc =0;
+                                else sonuc =1;
+                                    }
+                            else if(v1 ==p && v2 ==q )
+                                {
+                                if(p ==q) sonuc =0;
+                                else sonuc =1;
+                                }
+                                else if(v1 ==q && v2==p)
+                                    {
+                                if(p ==q) sonuc =0;
+                                else sonuc =1;
+                                    }
+                        }/// x controller ending
+
+                    Stack_Push(stackNumber,sonuc);
+                    }///n>0 controller //STACK SIZE
+                    else
+                Stack_Push(stackNumber,k);
+
+    }///DIÞ PARANTEZ ANA KONTROL SONU
+        s++;
+        }///While ending
+return Stack_Pop(stackNumber);
+}
+
+int main(int argc, char *argv[]) {
+
+	char expr[MAX_EXPR_SIZE+1];
+	int p, q, result;
+
+	while(1) {
+
+		printf("Bir mantiksal ifade giriniz: ");
+		scanf(" %s", expr);
+
+		printf("p q sonuc\n");
+		printf("- - -----\n");
+		printf("0 0 %d\n", EvaluatePQ(expr,0,0));
+		printf("0 1 %d\n", EvaluatePQ(expr,0,1));
+		printf("1 0 %d\n", EvaluatePQ(expr,1,0));
+		printf("1 1 %d\n", EvaluatePQ(expr,1,1));
+	}
+
+	return 0;
+}

@@ -1,0 +1,121 @@
+/*
+	Author: Hasan KAYA
+	Id: 150112041
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+
+
+#include <Stack.h>
+#include<ctype.h>
+#define MAX_EXPR_SIZE 100
+
+int Evaluate01(char *expr) {
+    Stack *stackNumber,*stackOperator;
+    stackNumber = (Stack *)malloc(sizeof(Stack));
+	Stack_initialize(stackNumber);
+
+    stackOperator = (Stack *)malloc(sizeof(Stack));
+	Stack_initialize(stackOperator);
+
+    //char c = expr[0];
+    char op,v1,v2,k;
+    int sonuc;
+    int s =0;
+
+    while(expr[s] != '\0')
+        {
+
+            //printf("%c %d\n", expr[s], expr[s]);
+            //fgetc(stdin);
+
+            k = expr[s];
+        if(k == '(');
+        else if( k == '>')Stack_Push(stackOperator,k);
+        else if(k=='.' ) Stack_Push(stackOperator,k);
+        else if(k=='+')  Stack_Push(stackOperator,k);
+        else if(k=='x') Stack_Push(stackOperator,k);
+        else if(k=='\'')
+            {
+                    Stack_Push(stackOperator,k);
+                    if(k==')')
+                        {
+                        v1 =(int)Stack_Pop(stackNumber);
+                             if(v1 == '1') sonuc =0;
+                            else if (v1 =='0')  sonuc=1;
+                            }
+                            Stack_Push(stackNumber,sonuc);
+                    /*v1 =(int)Stack_Pop(stackNumber);
+                    if(v1 == '1') sonuc =0;//Stack_Push(stackNumber,0);
+                    else if (v1 =='0')  sonuc=1;
+                     Stack_Push(stackNumber,sonuc);*/
+            }
+        else if (isdigit(k)){ Stack_Push(stackNumber,k); }
+
+
+        else if(k ==')')
+            {
+
+                if(stackOperator->n >0)
+                    {
+                    v1 = (int)Stack_Pop(stackNumber);
+                    v2 = (int)Stack_Pop(stackNumber);
+                    op = (char)Stack_Pop(stackOperator);
+
+
+
+                if(op =='>')
+                {
+                    if(v2 == '1' && v1 =='0') sonuc=0; //Stack_Push(stackNumber,0);
+                    else  sonuc = 1; //Stack_Push(stackNumber,1);
+                }
+                else if(op =='.')
+                {
+                    if(v1 =='0' || v2 == '0') sonuc =0;// Stack_Push(stackNumber,0);
+                    else sonuc= 1;//Stack_Push(stackNumber,1);
+                }
+                else if(op == '+')
+                {
+                    if(v1 =='0' && v2 == '0')sonuc=0;
+                    //Stack_Push(stackNumber,1);
+                    else  sonuc =1;
+                    //Stack_Push(stackNumber,0);
+
+                }
+                else if(op =='x')
+                {
+                    if(v1 == v2)   sonuc=0;//Stack_Push(stackNumber,0);
+                    else sonuc=1; //Stack_Push(stackNumber,1);
+                }
+
+                Stack_Push(stackNumber,sonuc);
+
+            }///n>0 controller
+            else
+                Stack_Push(stackNumber,k);
+
+
+            }///parantez kontrol
+   s++;
+}///while ending
+
+return (int)Stack_Pop(stackNumber);
+}///function ending
+
+int main(int argc, char *argv[]) {
+
+	char expr[MAX_EXPR_SIZE+1];
+
+	while(1) {
+
+		printf("Bir mantiksal ifade giriniz: ");
+		scanf(" %s", expr);
+
+		printf("Bu ifadenin sonucu: ");
+		printf("%d\n", Evaluate01(expr));
+	}
+
+	return 0;
+}
